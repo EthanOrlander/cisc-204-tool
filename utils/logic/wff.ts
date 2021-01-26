@@ -5,7 +5,9 @@ export abstract class WFF {
   constructor(formula: string) {
     this.formula = formula;
   }
-  abstract toString(): string;
+  toString() {
+    return this.formula;
+  }
 }
 
 export class Atom extends WFF {
@@ -14,11 +16,7 @@ export class Atom extends WFF {
     super(sanitize(formula));
     if (!Atom.validate(formula))
       throw Error(`Cannot create Atom from formula '${formula}'`);
-    // Strip any parentheses
-    this.identifier = formula.replace(/[\])[(]/g, '');
-  }
-  toString() {
-    return `${this.identifier}`;
+    this.identifier = sanitize(formula);
   }
   static validate(formula: string): boolean {
     const sanitized = sanitize(formula);
@@ -41,9 +39,6 @@ export abstract class ComplexWFF extends WFF {
     this.operand1 = operand1;
     this.operand2 = operand2;
   }
-  toString() {
-    return '';
-  }
   static validate(formula: string): boolean {
     return (
       Negation.validate(formula) ||
@@ -59,7 +54,6 @@ export class Negation extends ComplexWFF {
     if (!Negation.validate(formula))
       throw Error(`Cannot create Negation from formula '${formula}'`);
     const sanitized = sanitize(formula);
-    // If the formula passed validation, then we know the unwrapped formula is of the form `¬WFF`
     super(sanitize(formula), '¬', toWFF(sanitized.substr(1)));
   }
   static validate(formula: string): boolean {
@@ -80,7 +74,6 @@ export class Conjunction extends ComplexWFF {
       sanitized.substring(0, conjunctionIndex),
       sanitized.substring(conjunctionIndex + 1),
     ];
-    // If the formula passed validation, then we know the unwrapped formula is of the form `WFF → WFF`
     super(
       sanitize(formula),
       '∧',
@@ -110,7 +103,6 @@ export class Disjunction extends ComplexWFF {
       sanitized.substring(0, disjunctionIndex),
       sanitized.substring(disjunctionIndex + 1),
     ];
-    // If the formula passed validation, then we know the unwrapped formula is of the form `WFF → WFF`
     super(
       sanitize(formula),
       '∨',
@@ -142,7 +134,6 @@ export class MaterialImplication extends ComplexWFF {
       sanitized.substring(0, materialImplicationIndex),
       sanitized.substring(materialImplicationIndex + 1),
     ];
-    // If the formula passed validation, then we know the unwrapped formula is of the form `WFF → WFF`
     super(
       sanitize(formula),
       '→',
@@ -163,6 +154,14 @@ export class MaterialImplication extends ComplexWFF {
 }
 
 /**
+ * Check if a formula is a valid WFF.
+ * @param formula Formula to validate
+ * @returns Boolean, whether or not the formula is a valid WFF
+ */
+export const validateWFF = (formula: string): boolean =>
+  Atom.validate(formula) || ComplexWFF.validate(formula);
+
+/**
  * WFF factory function. Creates & returns either an Atom or a ComplexWFF.
  * @param formula Formula to parse into a WFF.
  * @returns An Atom or a ComplexWFF
@@ -173,14 +172,6 @@ export const toWFF = (formula: string): Atom | ComplexWFF => {
   if (ComplexWFF.validate(formula)) return toComplexWFF(formula);
   throw Error(`formula '${formula}' is not a WFF.`);
 };
-
-/**
- * Check if a formula is a valid WFF.
- * @param formula Formula to validate
- * @returns Boolean, whether or not the formula is a valid WFF
- */
-export const validateWFF = (formula: string): boolean =>
-  Atom.validate(formula) || ComplexWFF.validate(formula);
 
 /**
  * ComplexWFF factory function. Creates & returns an implementation of ComplexWFF.
@@ -194,6 +185,5 @@ const toComplexWFF = (formula: string): ComplexWFF => {
   if (Disjunction.validate(formula)) return new Disjunction(formula);
   if (MaterialImplication.validate(formula))
     return new MaterialImplication(formula);
-  // Do the same for conjunction, disjunction, and material implication
   throw Error(`formula ${formula} is not a ComplexWFF.`);
 };
