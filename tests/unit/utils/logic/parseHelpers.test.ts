@@ -1,6 +1,6 @@
 import {
   unwrap,
-  sanitize,
+  removeWhitespace,
   topLevelIndex,
   isWrapped,
 } from '../../../../utils/logic/parseHelpers';
@@ -41,26 +41,11 @@ describe('isWrapped()', () => {
   });
 });
 
-describe('sanitize()', () => {
-  test('unwraps a string with outer parentheses and removes white space', () => {
-    const before = '(A)';
-    const after = 'A';
-    expect(sanitize(before)).toMatch(after);
-  });
-  test('unwraps a string with outer brackets and removes white space', () => {
-    const before = '[A]';
-    const after = 'A';
-    expect(sanitize(before)).toMatch(after);
-  });
-  test("doesn't unwrap a string formatted (A) ∧ (B) and removes white space", () => {
+describe('removeWhitespace()', () => {
+  test('returns a string with no white space', () => {
     const before = '(A) ∧ (B)';
     const after = '(A)∧(B)';
-    expect(sanitize(before)).toMatch(after);
-  });
-  test('removes white space and otherwise leaves a string without outer parentheses nor brackets untouched', () => {
-    const before = 'A ∧ B';
-    const after = 'A∧B';
-    expect(sanitize(before)).toMatch(after);
+    expect(removeWhitespace(before)).toMatch(after);
   });
 });
 

@@ -1,15 +1,4 @@
 /**
- * Removes whitespace and surrounding brackets.
- * @param str String to sanitize.
- * @returns Sanitized string.
- */
-export const sanitize = (str: string): string => {
-  let sanitized = str.replace(/ /g, '');
-  sanitized = unwrap(sanitized);
-  return sanitized;
-};
-
-/**
  * Find the position of a character, at zero bracket depth.
  * @param str Haystack.
  * @param ch Needle.
@@ -30,19 +19,11 @@ export const topLevelIndex = (str: string, ch: string): number => {
 };
 
 /**
- * Unwraps a string if it is surrounded by parentheses.
- * @param str The string to unwrap.
- * @returns The unwrapped string.
+ * Removes whitespace.
+ * @param str String to remove whitespace from.
+ * @returns String without whitespace.
  */
-export const unwrap = (str: string): string => {
-  if (isWrapped(str)) {
-    let unwrapped = str;
-    unwrapped = unwrapped.substring(1);
-    unwrapped = unwrapped.substring(0, unwrapped.length - 1);
-    return unwrapped;
-  }
-  return str;
-};
+export const removeWhitespace = (str: string): string => str.replace(/ /g, '');
 
 /**
  * Determines if a string is wrapped in parentheses.
@@ -71,6 +52,21 @@ export const isWrapped = (str: string): boolean => {
       isWrapped = true;
   }
   return isWrapped;
+};
+
+/**
+ * Unwraps a string if it is surrounded by parentheses.
+ * @param str The string to unwrap.
+ * @returns The unwrapped string.
+ */
+export const unwrap = (str: string): string => {
+  if (isWrapped(str)) {
+    let unwrapped = str;
+    unwrapped = unwrapped.substring(1);
+    unwrapped = unwrapped.substring(0, unwrapped.length - 1);
+    return unwrapped;
+  }
+  return str;
 };
 
 // TODO function to convert string to WFF string using binding rules
