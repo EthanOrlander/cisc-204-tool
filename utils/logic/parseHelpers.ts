@@ -13,7 +13,7 @@ export const sanitize = (str: string): string => {
  * Find the position of a character, at zero bracket depth.
  * @param str Haystack.
  * @param ch Needle.
- * @returns The index of the needle, if found at the top leve. Or -1 if not exists.
+ * @returns The index of the needle, if found at the top level. Or -1 if not exists.
  */
 export const topLevelIndex = (str: string, ch: string): number => {
   let bracketDepth = 0;
@@ -24,8 +24,7 @@ export const topLevelIndex = (str: string, ch: string): number => {
     char = chars[i];
     if (char === '(') bracketDepth++;
     if (char === ')') bracketDepth--;
-    if (0 < i && i < chars.length - 1 && bracketDepth === 0 && char === ch)
-      chPosition = i;
+    if (bracketDepth === 0 && char === ch) chPosition = i;
   }
   return chPosition;
 };
@@ -36,32 +35,42 @@ export const topLevelIndex = (str: string, ch: string): number => {
  * @returns The unwrapped string.
  */
 export const unwrap = (str: string): string => {
-  // If the string has an opening bracket
+  if (isWrapped(str)) {
+    let unwrapped = str;
+    unwrapped = unwrapped.substring(1);
+    unwrapped = unwrapped.substring(0, unwrapped.length - 1);
+    return unwrapped;
+  }
+  return str;
+};
+
+/**
+ * Determines if a string is wrapped in parentheses.
+ * @param str String to check.
+ * @returns Whether or not the string is wrapped.
+ */
+export const isWrapped = (str: string): boolean => {
+  // If the string has an leading bracket
   // and the string returns to bracket depth zero before the end of the string
   // then the string is not wrapped in a set of brackets
-  let unwrapped = str;
   let bracketDepth = 0;
   let isWrapped = false;
-  const chars = unwrapped.split('');
+  const chars = str.split('');
   let char;
   for (let i = 0; i < chars.length; i++) {
     char = chars[i];
     if (char === '(') bracketDepth++;
     if (char === ')') bracketDepth--;
     // If bracketDepth is zero anywhere between the first char and the last char, it's not wrapped
-    if (0 < i && i < unwrapped.length - 1 && bracketDepth === 0) {
+    if (0 < i && i < str.length - 1 && bracketDepth === 0) {
       isWrapped = false;
       break;
     }
     // If bracketDepth is zero at the end, and the last char is ), then it is wrapped
-    else if (i === unwrapped.length - 1 && char === ')' && bracketDepth === 0)
+    else if (i === str.length - 1 && char === ')' && bracketDepth === 0)
       isWrapped = true;
   }
-  if (isWrapped) {
-    unwrapped = unwrapped.substring(1);
-    unwrapped = unwrapped.substring(0, unwrapped.length - 1);
-  }
-  return unwrapped;
+  return isWrapped;
 };
 
 // TODO function to convert string to WFF string using binding rules

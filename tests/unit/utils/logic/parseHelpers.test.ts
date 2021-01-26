@@ -2,6 +2,7 @@ import {
   unwrap,
   sanitize,
   topLevelIndex,
+  isWrapped,
 } from '../../../../utils/logic/parseHelpers';
 
 describe('unwrap()', () => {
@@ -24,6 +25,19 @@ describe('unwrap()', () => {
     const before = 'A ∧ B';
     const after = 'A ∧ B';
     expect(unwrap(before)).toMatch(after);
+  });
+});
+
+describe('isWrapped()', () => {
+  test('returns true if a string is wrapped in parentheses', () => {
+    const input = '((A) ∧ (B))';
+    const output = true;
+    expect(isWrapped(input)).toEqual(output);
+  });
+  test('returns false if a string is not wrapped in parentheses', () => {
+    const input = '(A) ∧ (B)';
+    const output = false;
+    expect(isWrapped(input)).toEqual(output);
   });
 });
 
