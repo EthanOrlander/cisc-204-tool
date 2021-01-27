@@ -1,4 +1,4 @@
-import { parseSequent } from '../../../../utils/logic/sequent';
+import { parseSequent } from './sequent';
 
 describe('a well formed seqeuent', () => {
   test('can be parsed', () => {

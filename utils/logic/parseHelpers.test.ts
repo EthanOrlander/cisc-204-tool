@@ -3,7 +3,7 @@ import {
   removeWhitespace,
   topLevelIndex,
   isWrapped,
-} from '../../../../utils/logic/parseHelpers';
+} from './parseHelpers';
 
 describe('unwrap()', () => {
   test('unwraps a string with outer parentheses', () => {

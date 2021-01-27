@@ -1,5 +1,5 @@
-import { topLevelIndex } from './parseHelpers';
-import { WFF, toWFF } from './wff';
+import { removeWhitespace, topLevelIndex } from './parseHelpers';
+import { WFF } from './wff';
 
 export type Sequent = {
   premises?: Array<WFF>;
@@ -13,9 +13,9 @@ export type Sequent = {
  */
 export const parseSequent = (sequent: string): Sequent => {
   let isTheorem: boolean, premises: Array<WFF>, conclusion: WFF;
-
+  const s = removeWhitespace(sequent);
   // Check if string contains ⊢ at top level
-  const turnstileIndex = topLevelIndex(sequent, '⊢');
+  const turnstileIndex = topLevelIndex(s, '⊢');
   if (turnstileIndex === -1)
     throw new Error(
       'sequent must contain a turnstile (⊢) at the top level of bracket depth'
@@ -23,16 +23,16 @@ export const parseSequent = (sequent: string): Sequent => {
   // Parse as a theorem
   if (turnstileIndex === 0) {
     premises = [];
-    conclusion = toWFF(sequent.substring(1));
+    conclusion = WFF.parse(s.substring(1));
     isTheorem = true;
   }
   // Parse as a sequent (idk the right terminology)
   else {
-    premises = sequent
+    premises = s
       .substring(0, turnstileIndex)
       .split(',')
-      .map((premise) => toWFF(premise));
-    conclusion = toWFF(sequent.substring(turnstileIndex + 1));
+      .map((premise) => WFF.parse(premise));
+    conclusion = WFF.parse(s.substring(turnstileIndex + 1));
     isTheorem = false;
   }
 
