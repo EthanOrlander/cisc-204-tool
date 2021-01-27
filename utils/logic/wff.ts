@@ -3,7 +3,7 @@ import { removeWhitespace, topLevelIndex, unwrap } from './parseHelpers';
 /**
  * All WFF constructors expect the formula to have no whitespace.
  */
-export abstract class WFF {
+export default abstract class WFF {
   formula: string;
   constructor(formula: string) {
     this.formula = formula;
