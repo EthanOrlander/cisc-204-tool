@@ -1,5 +1,4 @@
-import { Atom, WFF } from './wff';
-const util = require('util');
+import { Atom, ComplexWFF } from './wff';
 
 describe('an Atom', () => {
   test('can be created from any capital letter', () => {
@@ -29,7 +28,7 @@ describe('an Atom', () => {
     }
     lowercaseAlphabet.forEach((letter) =>
       expect(() => new Atom(letter)).toThrow(
-        `Cannot create Atom from formula '${letter}'`
+        `Cannot create Atom from '${letter}'`
       )
     );
   });
@@ -39,53 +38,53 @@ describe('a ComplexWFF', () => {
   describe('can be a conjunction', () => {
     test('of Atoms', () => {
       const formula = 'A ∧ B';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of ComplexWFFs', () => {
       const formula = '((¬A) ∧ (¬B))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of an Atom with a ComplexWFF', () => {
       const formula = '(A ∧ (¬B))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
   });
   describe('can be a disjunction', () => {
     test('of Atoms', () => {
       const formula = 'A ∨ B';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of ComplexWFFs', () => {
       const formula = '((¬A) ∨ ((C → (¬B)) ∧ (¬B)))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of an Atom with a ComplexWFF', () => {
       const formula = '(A ∨ ((C → (¬B)) ∧ (¬B)))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
   });
   describe('can be a negation', () => {
     test('of an Atom', () => {
       const formula = '¬A';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of a ComplexWFF', () => {
       const formula = '(¬(¬A))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
   });
   describe('can be a material implication', () => {
     test('of Atoms', () => {
       const formula = 'A → B';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of ComplexWFFs', () => {
       const formula = '((¬A) → (¬B))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
     test('of an Atom with a ComplexWFF', () => {
       const formula = '(A → (¬B))';
-      expect(WFF.parse(formula)).toBeDefined;
+      expect(ComplexWFF.parse(formula)).toBeDefined;
     });
   });
 });

@@ -93,7 +93,8 @@ export class Negation extends ComplexWFF {
     if (!Negation.validate(formula))
       throw Error(`Cannot create Negation from '${formula}'`);
     const f = unwrap(formula);
-    super(f, '¬', WFF.parse(f.substr(1)));
+    const operand = WFF.parse(f.substr(1));
+    super(f, '¬', operand);
   }
   static validate(formula: string): boolean {
     let f = unwrap(formula);
@@ -113,7 +114,9 @@ export class Conjunction extends ComplexWFF {
       f.substring(0, conjunctionIndex),
       f.substring(conjunctionIndex + 1),
     ];
-    super(f, '∧', WFF.parse(operandStrings[0]), WFF.parse(operandStrings[1]));
+    const operand1 = WFF.parse(operandStrings[0]),
+      operand2 = WFF.parse(operandStrings[1]);
+    super(f, '∧', operand1, operand2);
   }
   static validate(formula: string): boolean {
     let f = unwrap(formula);
@@ -137,7 +140,9 @@ export class Disjunction extends ComplexWFF {
       f.substring(0, disjunctionIndex),
       f.substring(disjunctionIndex + 1),
     ];
-    super(f, '∨', WFF.parse(operandStrings[0]), WFF.parse(operandStrings[1]));
+    const operand1 = WFF.parse(operandStrings[0]),
+      operand2 = WFF.parse(operandStrings[1]);
+    super(f, '∨', operand1, operand2);
   }
   static validate(formula: string): boolean {
     let f = unwrap(formula);
@@ -161,7 +166,9 @@ export class MaterialImplication extends ComplexWFF {
       f.substring(0, materialImplicationIndex),
       f.substring(materialImplicationIndex + 1),
     ];
-    super(f, '→', WFF.parse(operandStrings[0]), WFF.parse(operandStrings[1]));
+    const operand1 = WFF.parse(operandStrings[0]),
+      operand2 = WFF.parse(operandStrings[1]);
+    super(f, '→', operand1, operand2);
   }
   static validate(formula: string): boolean {
     let f = unwrap(formula);

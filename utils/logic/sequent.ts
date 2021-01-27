@@ -1,40 +1,33 @@
 import { removeWhitespace, topLevelIndex } from './parseHelpers';
-import { WFF } from './wff';
+import WFF from './wff';
 
-export type Sequent = {
+export default class Sequent {
   premises?: Array<WFF>;
   conclusion: WFF;
-  isTheorem: boolean;
-};
-
-/**
- * Parses a sequent into premises and a conclusion. Flags if the sequent is a theorem.
- * @param sequent The sequent to parse.
- */
-export const parseSequent = (sequent: string): Sequent => {
-  let isTheorem: boolean, premises: Array<WFF>, conclusion: WFF;
-  const s = removeWhitespace(sequent);
-  // Check if string contains ⊢ at top level
-  const turnstileIndex = topLevelIndex(s, '⊢');
-  if (turnstileIndex === -1)
-    throw new Error(
-      'sequent must contain a turnstile (⊢) at the top level of bracket depth'
-    );
-  // Parse as a theorem
-  if (turnstileIndex === 0) {
-    premises = [];
-    conclusion = WFF.parse(s.substring(1));
-    isTheorem = true;
+  constructor(premises: Array<WFF>, conclusion: WFF) {
+    this.premises = premises;
+    this.conclusion = conclusion;
   }
-  // Parse as a sequent (idk the right terminology)
-  else {
-    premises = s
+  static parse(sequent: string): Sequent | Theorem {
+    const s = removeWhitespace(sequent);
+    const turnstileIndex = topLevelIndex(s, '⊢');
+    if (turnstileIndex === -1)
+      throw new Error(
+        'sequent must contain a turnstile (⊢) at the top level of bracket depth'
+      );
+    const conclusion = WFF.parse(s.substring(turnstileIndex + 1));
+    // Parse as a theorem
+    if (turnstileIndex === 0) return new Theorem(conclusion);
+    const premises = s
       .substring(0, turnstileIndex)
       .split(',')
       .map((premise) => WFF.parse(premise));
-    conclusion = WFF.parse(s.substring(turnstileIndex + 1));
-    isTheorem = false;
+    return new Sequent(premises, conclusion);
   }
+}
 
-  return { premises, conclusion, isTheorem };
-};
+export class Theorem extends Sequent {
+  constructor(conclusion: WFF) {
+    super(undefined, conclusion);
+  }
+}
