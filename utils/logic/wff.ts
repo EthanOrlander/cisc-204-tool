@@ -71,7 +71,6 @@ export abstract class ComplexWFF extends WFF {
       MaterialImplication.validate(formula)
     );
   }
-
   /**
    * ComplexWFF factory function. Creates & returns an implementation of ComplexWFF.
    * @param formula Sanitized formula to parse into a ComplexWFF.
@@ -88,96 +87,79 @@ export abstract class ComplexWFF extends WFF {
   }
 }
 
-export class Negation extends ComplexWFF {
+export abstract class ComplexWFFInfix extends ComplexWFF {
+  constructor(formula: string, operator: '∧' | '∨' | '→') {
+    const f = unwrap(formula);
+    const operatorIndex = topLevelIndex(f, operator);
+    const operandStrings = [
+      f.substring(0, operatorIndex),
+      f.substring(operatorIndex + 1),
+    ];
+    const operand1 = WFF.parse(operandStrings[0]),
+      operand2 = WFF.parse(operandStrings[1]);
+    super(f, operator, operand1, operand2);
+  }
+  static generateValidator(operator: string): (formula: string) => boolean {
+    return (formula: string) => {
+      let f = unwrap(formula);
+      const operatorIndex = topLevelIndex(f, operator);
+      if (operatorIndex === -1) return false;
+      const operandStrings = [
+        f.substring(0, operatorIndex),
+        f.substring(operatorIndex + 1),
+      ];
+      return WFF.validate(operandStrings[0]) && WFF.validate(operandStrings[1]);
+    };
+  }
+}
+
+export class ComplexWFFPrefix extends ComplexWFF {
+  constructor(formula: string, operator: '¬') {
+    const f = unwrap(formula);
+    super(formula, operator, WFF.parse(f.substr(1)));
+  }
+  static generateValidator(operator: '¬'): (formula: string) => boolean {
+    return (formula: string) => {
+      let f = unwrap(formula);
+      if (f.charAt(0) !== operator) return false;
+      const operandStr = f.substr(1);
+      return WFF.validate(operandStr);
+    };
+  }
+}
+
+export class Negation extends ComplexWFFPrefix {
   constructor(formula: string) {
     if (!Negation.validate(formula))
       throw Error(`Cannot create Negation from '${formula}'`);
-    const f = unwrap(formula);
-    const operand = WFF.parse(f.substr(1));
-    super(f, '¬', operand);
+    super(formula, '¬');
   }
-  static validate(formula: string): boolean {
-    let f = unwrap(formula);
-    if (f.charAt(0) !== '¬') return false;
-    const operandStr = f.substr(1);
-    return WFF.validate(operandStr);
-  }
+  static validate = ComplexWFFPrefix.generateValidator('¬');
 }
 
-export class Conjunction extends ComplexWFF {
+export class Conjunction extends ComplexWFFInfix {
   constructor(formula: string) {
     if (!Conjunction.validate(formula))
       throw Error(`Cannot create Conjunction from '${formula}'`);
-    const f = unwrap(formula);
-    const conjunctionIndex = topLevelIndex(f, '∧');
-    const operandStrings = [
-      f.substring(0, conjunctionIndex),
-      f.substring(conjunctionIndex + 1),
-    ];
-    const operand1 = WFF.parse(operandStrings[0]),
-      operand2 = WFF.parse(operandStrings[1]);
-    super(f, '∧', operand1, operand2);
+    super(formula, '∧');
   }
-  static validate(formula: string): boolean {
-    let f = unwrap(formula);
-    const conjunctionIndex = topLevelIndex(f, '∧');
-    if (conjunctionIndex === -1) return false;
-    const operandStrings = [
-      f.substring(0, conjunctionIndex),
-      f.substring(conjunctionIndex + 1),
-    ];
-    return WFF.validate(operandStrings[0]) && WFF.validate(operandStrings[1]);
-  }
+  static validate = ComplexWFFInfix.generateValidator('∧');
 }
 
-export class Disjunction extends ComplexWFF {
+export class Disjunction extends ComplexWFFInfix {
   constructor(formula: string) {
     if (!Disjunction.validate(formula))
       throw Error(`Cannot create Disjunction from '${formula}'`);
-    const f = unwrap(formula);
-    const disjunctionIndex = topLevelIndex(f, '∨');
-    const operandStrings = [
-      f.substring(0, disjunctionIndex),
-      f.substring(disjunctionIndex + 1),
-    ];
-    const operand1 = WFF.parse(operandStrings[0]),
-      operand2 = WFF.parse(operandStrings[1]);
-    super(f, '∨', operand1, operand2);
+    super(formula, '∨');
   }
-  static validate(formula: string): boolean {
-    let f = unwrap(formula);
-    const disjunctionIndex = topLevelIndex(f, '∨');
-    if (disjunctionIndex === -1) return false;
-    const operandStrings = [
-      f.substring(0, disjunctionIndex),
-      f.substring(disjunctionIndex + 1),
-    ];
-    return WFF.validate(operandStrings[0]) && WFF.validate(operandStrings[1]);
-  }
+  static validate = ComplexWFFInfix.generateValidator('∨');
 }
 
-export class MaterialImplication extends ComplexWFF {
+export class MaterialImplication extends ComplexWFFInfix {
   constructor(formula: string) {
     if (!MaterialImplication.validate(formula))
       throw Error(`Cannot create MaterialImplication from '${formula}'`);
-    const f = unwrap(formula);
-    const materialImplicationIndex = topLevelIndex(f, '→');
-    const operandStrings = [
-      f.substring(0, materialImplicationIndex),
-      f.substring(materialImplicationIndex + 1),
-    ];
-    const operand1 = WFF.parse(operandStrings[0]),
-      operand2 = WFF.parse(operandStrings[1]);
-    super(f, '→', operand1, operand2);
+    super(formula, '→');
   }
-  static validate(formula: string): boolean {
-    let f = unwrap(formula);
-    const materialImplicationIndex = topLevelIndex(f, '→');
-    if (materialImplicationIndex === -1) return false;
-    const operandStrings = [
-      f.substring(0, materialImplicationIndex),
-      f.substring(materialImplicationIndex + 1),
-    ];
-    return WFF.validate(operandStrings[0]) && WFF.validate(operandStrings[1]);
-  }
+  static validate = ComplexWFFInfix.generateValidator('→');
 }
