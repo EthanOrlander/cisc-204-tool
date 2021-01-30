@@ -13,7 +13,7 @@ export default class Sequent {
     const turnstileIndex = topLevelIndex(s, '⊢');
     if (turnstileIndex === -1)
       throw new Error(
-        'sequent must contain a turnstile (⊢) at the top level of bracket depth'
+        'Sequent must contain a turnstile (⊢) at the top level of bracket depth'
       );
     const conclusion = WFF.parse(s.substring(turnstileIndex + 1));
     if (turnstileIndex === 0) return new Theorem(conclusion);
