@@ -144,6 +144,9 @@ export class Conjunction extends ComplexWFFInfix {
     super(formula, '∧');
   }
   static validate = ComplexWFFInfix.generateValidator('∧');
+  static from(a: WFF, b: WFF) {
+    return new Conjunction(`(${unwrap(a.formula)}) ∧ (${unwrap(b.formula)})`);
+  }
 }
 
 export class Disjunction extends ComplexWFFInfix {
